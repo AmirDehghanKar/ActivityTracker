@@ -28,7 +28,7 @@ icon.filename = %(source.dir)s/icon.png
 
 # اسپلش (اختیاری)
 presplash.filename = %(source.dir)s/splash.png
-android.presplash_color = #051433
+android.presplash_color = #000000
 
 # تمام صفحه
 fullscreen = 0
