@@ -29,7 +29,7 @@ class SplashScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.name = "splash"
-        self.md_bg_color = (0.02, 0.08, 0.20, 1)   # هم‌رنگ حاشیه عکس
+        self.md_bg_color = (0, 0, 0, 1)   # هم‌رنگ حاشیه عکس
 
         splash_path = os.path.join(os.path.dirname(__file__), "splash.png")
         if os.path.exists(splash_path):
