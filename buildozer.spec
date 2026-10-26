@@ -14,7 +14,7 @@ source.dir = .
 source.include_exts = py,png,jpg,jpeg,gif,ttf,kv,atlas,json,txt
 
 # نسخه اپ
-version = 1.0.2
+version = 1.0.3
 
 # نیازمندی‌ها
 requirements = hostpython3==3.11.6,python3==3.11.6,kivy==2.3.1,kivymd==1.2.0,pillow,sqlite3,arabic-reshaper,python-bidi==0.4.2,jdatetime,six
@@ -31,7 +31,7 @@ presplash.filename = %(source.dir)s/splash.png
 android.presplash_color = #000000
 
 # تمام صفحه
-fullscreen = 0
+fullscreen = 1
 
 # مجوزها (برای نوتیفیکیشن آینده)
 android.permissions = INTERNET,VIBRATE,RECEIVE_BOOT_COMPLETED,POST_NOTIFICATIONS,SCHEDULE_EXACT_ALARM,USE_EXACT_ALARM
