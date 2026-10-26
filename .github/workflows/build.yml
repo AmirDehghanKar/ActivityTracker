@@ -48,3 +48,13 @@ jobs:
         with:
           name: package
           path: bin/*.apk
+
+      - name: Diagnose manifest
+        if: always()
+        continue-on-error: true
+        run: |
+          D=.buildozer/android/platform/build-arm64-v8a/dists/zistro
+          echo "=== generated manifest ==="
+          sed -n '1,70p' $D/src/main/AndroidManifest.xml
+          echo "=== p4a template ==="
+          grep -rn "extra_manifest" .buildozer/android/platform/python-for-android/pythonforandroid/bootstraps --include="*.xml"
