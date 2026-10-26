@@ -11,7 +11,7 @@ package.domain = org.zistro
 
 # فایل اصلی اجرا
 source.dir = .
-source.include_exts = py,png,jpg,jpeg,ttf,kv,json,txt
+source.include_exts = py,png,jpg,jpeg,gif,ttf,kv,atlas,json,txt
 
 # نسخه اپ
 version = 1.0.2
