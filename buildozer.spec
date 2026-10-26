@@ -43,7 +43,7 @@ android.extra_manifest_application_arguments = extra_manifest_application.xml
 android.minapi = 24
 
 # معماری‌ها
-android.archs = arm64-v8a, armeabi-v7a
+source.include_exts = py,png,jpg,jpeg,gif,ttf,kv,atlas,json,txt
 
 # API
 android.api = 35
