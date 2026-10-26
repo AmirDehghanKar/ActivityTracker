@@ -46,11 +46,7 @@ android.minapi = 24
 # API
 android.api = 35
 android.archs = arm64-v8a
-android.ndk = 25b
 
-p4a.branch = master
-
-android.ndk_path = /home/poseidonhost/.buildozer/android/platform/android-ndk-r29
 
 # قبول لایسنس
 android.accept_sdk_license = True
