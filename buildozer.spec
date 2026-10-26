@@ -42,12 +42,10 @@ android.extra_manifest_application_arguments = extra_manifest_application.xml
 # حداقل نسخه اندروید
 android.minapi = 24
 
-# معماری‌ها
-source.include_exts = py,png,jpg,jpeg,gif,ttf,kv,atlas,json,txt
 
 # API
 android.api = 35
-
+android.archs = arm64-v8a
 android.ndk = 25b
 
 p4a.branch = master
