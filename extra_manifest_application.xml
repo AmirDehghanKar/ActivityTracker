@@ -1,0 +1,2 @@
+<receiver android:name="org.zistro.zistro.ReminderReceiver"
+          android:exported="false" />
