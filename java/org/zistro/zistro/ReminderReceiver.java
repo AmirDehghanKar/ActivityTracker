@@ -46,6 +46,7 @@ public class ReminderReceiver extends BroadcastReceiver {
             : new Notification.Builder(context);
         b.setContentTitle(title)
          .setContentText(body)
+         .setStyle(new Notification.BigTextStyle().bigText(body))
          .setSmallIcon(context.getApplicationInfo().icon)
          .setContentIntent(open)
          .setAutoCancel(true);
