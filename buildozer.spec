@@ -27,7 +27,7 @@ orientation = portrait
 icon.filename = %(source.dir)s/icon.png
 
 # اسپلش (اختیاری)
-presplash.filename = %(source.dir)s/splash.png
+presplash.filename = %(source.dir)s/presplash_blank.png
 android.presplash_color = #000000
 
 # تمام صفحه
