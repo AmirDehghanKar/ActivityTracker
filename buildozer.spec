@@ -37,7 +37,7 @@ fullscreen = 0
 android.permissions = INTERNET,VIBRATE,RECEIVE_BOOT_COMPLETED,POST_NOTIFICATIONS,SCHEDULE_EXACT_ALARM,USE_EXACT_ALARM
 
 android.add_src = java
-#android.extra_manifest_application_arguments = extra_manifest_application.xml
+android.extra_manifest_application_xml = %(source.dir)s/extra_manifest_application.xml
 
 # حداقل نسخه اندروید
 android.minapi = 24
