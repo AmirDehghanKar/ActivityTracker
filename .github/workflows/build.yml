@@ -34,7 +34,16 @@ jobs:
           rm -rf /tmp/pylibs/bin /tmp/pylibs/*.dist-info /tmp/pylibs/__pycache__
           cp -r /tmp/pylibs/. .
           ls
-
+          
+      - name: Prepare patched python-for-android
+        run: |
+          git clone --depth 1 --branch master https://github.com/kivy/python-for-android.git /tmp/p4a
+          for f in $(find /tmp/p4a/pythonforandroid/bootstraps -name AndroidManifest.tmpl.xml); do
+            sed -i 's#</application>#    <receiver android:name="org.zistro.zistro.ReminderReceiver" android:exported="false" />\n    </application>#' "$f"
+            echo "patched: $f"
+            grep -n "ReminderReceiver" "$f"
+          done
+          
       - name: Build APK
         run: |
           set -o pipefail
