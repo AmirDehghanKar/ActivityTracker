@@ -381,7 +381,13 @@ class AddEditScreen(MDScreen):
             if not title:
                 self.show_error(fa("عنوان فعالیت را وارد کنید"))
                 return
-            if not time or len(time) != 5 or time[2] != ":":
+                    
+            valid_time = False
+            if len(time) == 5 and time[2] == ":" and time[:2].isdigit() and time[3:].isdigit():
+                hour, minute = int(time[:2]), int(time[3:])
+                valid_time = 0 <= hour <= 23 and 0 <= minute <= 59
+
+            if not valid_time:
                 self.show_error(fa("ساعت را به فرمت صحیح وارد کنید (مثال: 08:30)"))
                 return
 
