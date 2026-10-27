@@ -17,6 +17,8 @@ from screens.profile_screen import ProfileScreen
 from database import Database
 from screens.manage_screen import ManageScreen
 from kivy.core.window import Window
+from kivy.utils import platform
+
 Window.softinput_mode = "below_target"
 
 # ثبت فونت
@@ -71,10 +73,7 @@ class ActivityTrackerApp(MDApp):
 
         self.sm = MDScreenManager()
 
-        # صفحه اسپلش (فقط موقع ورود)
         self.sm.add_widget(SplashScreen())
-
-        # صفحات اصلی
         self.sm.add_widget(TodayScreen(name="today", db=self.db))
         self.sm.add_widget(AddEditScreen(name="add_edit", db=self.db))
         self.sm.add_widget(ReportsScreen(name="reports", db=self.db))
@@ -82,14 +81,35 @@ class ActivityTrackerApp(MDApp):
         self.sm.add_widget(ManageScreen(name="manage", db=self.db))
         self.sm.current = "splash"
 
+        # نوارهای فضای امن: بالا هم‌رنگ هدر، پایین سفید
+        self.top_pad = MDBoxLayout(
+            size_hint_y=None, height=0,
+            md_bg_color=(0.0, 0.208, 0.400, 1)
+        )
+        self.bottom_pad = MDBoxLayout(
+            size_hint_y=None, height=0,
+            md_bg_color=(1, 1, 1, 1)
+        )
+
+        root = MDBoxLayout(orientation="vertical")
+        root.add_widget(self.top_pad)
+        root.add_widget(self.sm)
+        root.add_widget(self.bottom_pad)
+
+        Clock.schedule_once(self.go_to_main, 5)
+        return root
         # بعد از ۵ ثانیه برو به صفحه اصلی و اسپلش را حذف کن
         Clock.schedule_once(self.go_to_main, 5)
 
         return self.sm
 
     def go_to_main(self, *args):
+        # فضای امن بعد از اسپلش اعمال می‌شود تا اسپلش تمام‌صفحه بماند
+        top, bottom = self._get_insets()
+        self.top_pad.height = top
+        self.bottom_pad.height = bottom
+
         self.sm.current = "today"
-        # حذف اسپلش بعد از پایان ترنزیشن
         Clock.schedule_once(self._remove_splash, 1)
 
     def _remove_splash(self, *args):
@@ -107,7 +127,28 @@ class ActivityTrackerApp(MDApp):
         for i in range(1, 40):
             d = today - timedelta(days=i)
             self.db.recalculate_day_status(d)
-
+            
+    def _get_insets(self):
+        """ارتفاع نوار وضعیت (بالا) و نوار ناوبری (پایین) به پیکسل"""
+        if platform != "android":
+            return 0, 0
+        top = bottom = 0
+        try:
+            from jnius import autoclass
+            activity = autoclass("org.kivy.android.PythonActivity").mActivity
+            insets = activity.getWindow().getDecorView().getRootWindowInsets()
+            if insets is not None:
+                top = insets.getSystemWindowInsetTop()
+                bottom = insets.getSystemWindowInsetBottom()
+            if top == 0:
+                res = activity.getResources()
+                rid = res.getIdentifier("status_bar_height", "dimen", "android")
+                if rid > 0:
+                    top = res.getDimensionPixelSize(rid)
+        except Exception as e:
+            print("insets error:", e)
+        return top, bottom
+        
     def on_stop(self):
         self.db.close()
 
