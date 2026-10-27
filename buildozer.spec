@@ -31,7 +31,7 @@ presplash.filename = %(source.dir)s/presplash_blank.png
 android.presplash_color = #000000
 
 # تمام صفحه
-fullscreen = 1
+fullscreen = 0
 
 # مجوزها (برای نوتیفیکیشن آینده)
 android.permissions = INTERNET,VIBRATE,RECEIVE_BOOT_COMPLETED,POST_NOTIFICATIONS,SCHEDULE_EXACT_ALARM,USE_EXACT_ALARM
