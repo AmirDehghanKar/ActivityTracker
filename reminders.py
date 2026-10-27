@@ -34,7 +34,10 @@ def schedule_all(db):
 
         Receiver.cancelAll(activity)
 
+        name = db.get_name() or "کاربر"
+
         for act in db.get_all_activities():
+            body = f"{name} عزیز، فعالیت «{act['title']}» سر رسیده و باید انجامش بدی."
             for d in str(act["recurrence"]).split(","):
                 d = d.strip()
                 if not d.isdigit():
@@ -44,8 +47,8 @@ def schedule_all(db):
                 when = _next_time(wd, act["time"])
                 Receiver.schedule(
                     activity,
-                    act["title"],
-                    "زمان این فعالیت رسیده است",
+                    "زمان فعالیت رسید",
+                    body,
                     code,
                     when,
                 )
