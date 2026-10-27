@@ -276,7 +276,7 @@ class ProfileScreen(MDScreen):
         ))
 
         footer.add_widget(MDLabel(
-            text="Version: 1.0.3",
+            text="Version: 1.0.4",
             font_name="Vazir",
             theme_text_color="Custom",
             text_color=(0.55, 0.58, 0.62, 1),
