@@ -12,6 +12,7 @@ import webbrowser
 import os
 from kivy.uix.image import Image
 from kivy.uix.scrollview import ScrollView
+import reminders
 
 
 # رنگ‌های اصلی (همان today_screen)
@@ -374,6 +375,7 @@ class ProfileScreen(MDScreen):
         if name:
             self.db.set_name(name)
             self.name_preview.text = fa(name)
+            reminders.schedule_all(self.db)
 
     def go_back(self, *args):
         self.manager.current = "today"
