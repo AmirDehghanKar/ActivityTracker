@@ -43,7 +43,6 @@ p4a.source_dir = /tmp/p4a
 # حداقل نسخه اندروید
 android.minapi = 24
 
-
 # API
 android.api = 35
 android.archs = arm64-v8a
