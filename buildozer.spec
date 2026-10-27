@@ -48,6 +48,7 @@ android.minapi = 24
 android.api = 35
 android.archs = arm64-v8a
 
+android.allow_backup = False
 
 # قبول لایسنس
 android.accept_sdk_license = True
