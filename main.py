@@ -18,6 +18,9 @@ from database import Database
 from screens.manage_screen import ManageScreen
 from kivy.core.window import Window
 from kivy.utils import platform
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.button import MDFlatButton, MDRaisedButton
+from persian import fa
 
 Window.softinput_mode = "below_target"
 
@@ -95,14 +98,57 @@ class ActivityTrackerApp(MDApp):
         root.add_widget(self.top_pad)
         root.add_widget(self.sm)
         root.add_widget(self.bottom_pad)
-
+        
+        Window.bind(on_keyboard=self.on_back_key)
+        self.exit_dialog = None
+        
         Clock.schedule_once(self.go_to_main, 5)
         return root
         # بعد از ۵ ثانیه برو به صفحه اصلی و اسپلش را حذف کن
         Clock.schedule_once(self.go_to_main, 5)
 
         return self.sm
+        
+    def on_back_key(self, window, key, *args):
+        # کد 27 = دکمه بازگشت اندروید (روی کامپیوتر: Esc)
+        if key != 27:
+            return False
 
+        current = self.sm.current
+        if current == "splash":
+            return True                      # در اسپلش هیچ کاری نکن
+        if current != "today":
+            self.sm.current = "today"        # هر صفحه دیگر: برو صفحه اصلی
+            return True
+
+        self.show_exit_dialog()              # صفحه اصلی: تأیید خروج
+        return True
+
+    def show_exit_dialog(self):
+        if self.exit_dialog is not None:
+            return
+        self.exit_dialog = MDDialog(
+            text=fa("آیا می‌خواهید از زیسترو خارج شوید؟"),
+            buttons=[
+                MDFlatButton(
+                    text=fa("خیر"),
+                    theme_text_color="Custom",
+                    text_color=(0.0, 0.208, 0.400, 1),
+                    font_name="Vazir",
+                    on_release=lambda x: self.exit_dialog.dismiss()
+                ),
+                MDRaisedButton(
+                    text=fa("بله"),
+                    md_bg_color=(0.0, 0.208, 0.400, 1),
+                    text_color=(1, 1, 1, 1),
+                    font_name="Vazir",
+                    on_release=lambda x: self.stop()
+                ),
+            ],
+            on_dismiss=lambda *a: setattr(self, "exit_dialog", None)
+        )
+        self.exit_dialog.open()
+        
     def go_to_main(self, *args):
         # فضای امن بعد از اسپلش اعمال می‌شود تا اسپلش تمام‌صفحه بماند
         top, bottom = self._get_insets()
