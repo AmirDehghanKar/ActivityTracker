@@ -13,7 +13,7 @@ import os
 from kivy.uix.image import Image
 from kivy.uix.scrollview import ScrollView
 import reminders
-
+from kivymd.uix.dialog import MDDialog
 
 # رنگ‌های اصلی (همان today_screen)
 PRIMARY = (0.0, 0.208, 0.400, 1)       # #003566
@@ -376,6 +376,24 @@ class ProfileScreen(MDScreen):
             self.db.set_name(name)
             self.name_preview.text = fa(name)
             reminders.schedule_all(self.db)
+            self.show_message("نام کاربری شما با موفقیت ثبت شد.")
+        else:
+            self.show_message("لطفاً نام خود را وارد کنید.")
+
+    def show_message(self, text):
+        dialog = MDDialog(
+            text=fa(text),
+            buttons=[
+                MDFlatButton(
+                    text=fa("باشه"),
+                    theme_text_color="Custom",
+                    text_color=PRIMARY,
+                    font_name="Vazir",
+                    on_release=lambda x: dialog.dismiss()
+                )
+            ]
+        )
+        dialog.open()
 
     def go_back(self, *args):
         self.manager.current = "today"
