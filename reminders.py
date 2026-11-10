@@ -36,6 +36,15 @@ def schedule_all(db):
 
         name = db.get_name() or "کاربر"
 
+        for wd in range(7):
+            Receiver.schedule(
+                activity,
+                "زمان ثبت فعالیت‌ها",
+                "فراموش نکن فعالیت‌های روزانه‌ات را ثبت کنی. فقط ۱۵ دقیقه زمان باقی‌ست!",
+                9000000 + wd,
+                _next_time(wd, "23:45"),
+            )
+
         for act in db.get_all_activities():
             body = f"{name} عزیز، فعالیت «{act['title']}» سر رسیده و باید انجامش بدی."
             for d in str(act["recurrence"]).split(","):
