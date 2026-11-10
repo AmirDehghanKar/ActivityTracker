@@ -8,6 +8,7 @@ from kivy.metrics import dp
 from datetime import date
 from persian import fa
 import jdatetime
+from kivy.clock import Clock
 from kivymd.uix.button import MDIconButton
 from kivymd.uix.dialog import MDDialog
 from kivy.uix.widget import Widget
@@ -298,7 +299,6 @@ class TodayScreen(MDScreen):
         right.add_widget(self.status_label)
         right.add_widget(self.score_label)
         self.status_row.add_widget(right)
-
     def update_activities(self):
         self.activity_list.clear_widgets()
         activities = self.db.get_activities_for_date(self.today)
@@ -324,10 +324,8 @@ class TodayScreen(MDScreen):
                 radius=[16],
                 elevation=1,
                 md_bg_color=CARD_BG,
-                line_color=(0.88, 0.90, 0.92, 1) if not is_done else (0.2, 0.7, 0.4, 0.4),
                 line_width=1.5
             )
-
             row = MDBoxLayout(orientation="horizontal", spacing=dp(12))
 
             check_btn = MDCard(
@@ -336,24 +334,15 @@ class TodayScreen(MDScreen):
                 pos_hint={"center_y": 0.5},
                 radius=[dp(11)],
                 elevation=0,
-                md_bg_color=(0.15, 0.65, 0.35, 1) if is_done else (1, 1, 1, 1),
-                line_color=(0.15, 0.65, 0.35, 1) if is_done else PRIMARY,
                 line_width=1.2,
-                ripple_behavior=True,
-                on_release=lambda x, a_id=act["id"], done=is_done: self.toggle_done(a_id, not done)
+                ripple_behavior=True
             )
-            if is_done:
-                check_btn.add_widget(MDLabel(
-                    text="✓",
-                    halign="center",
-                    valign="middle",
-                    theme_text_color="Custom",
-                    text_color=WHITE,
-                    bold=True,
-                    font_size="13sp"
-                ))
+            check_btn.is_done = is_done
+            self._apply_done_style(card, check_btn, is_done)
+            check_btn.bind(
+                on_release=lambda x, a_id=act["id"], c=card: self.toggle_done(a_id, c, x)
+            )
             row.add_widget(check_btn)
-
 
             text_box = MDBoxLayout(orientation="vertical", spacing=dp(2))
             text_box.add_widget(MDLabel(
@@ -377,9 +366,33 @@ class TodayScreen(MDScreen):
             card.add_widget(row)
             self.activity_list.add_widget(card)
 
-    def toggle_done(self, activity_id, is_done):
+    def _apply_done_style(self, card, check_btn, done):
+        green = (0.15, 0.65, 0.35, 1)
+        card.line_color = (0.2, 0.7, 0.4, 0.4) if done else (0.88, 0.90, 0.92, 1)
+        check_btn.md_bg_color = green if done else (1, 1, 1, 1)
+        check_btn.line_color = green if done else PRIMARY
+        check_btn.clear_widgets()
+        if done:
+            check_btn.add_widget(MDLabel(
+                text="✓",
+                halign="center",
+                valign="middle",
+                theme_text_color="Custom",
+                text_color=WHITE,
+                bold=True,
+                font_size="13sp"
+            ))
+
+    def toggle_done(self, activity_id, card, check_btn):
+        new_state = not getattr(check_btn, "is_done", False)
+        check_btn.is_done = new_state
+        self._apply_done_style(card, check_btn, new_state)   # تغییر ظاهر فوری
+        # ذخیره بعد از اینکه صفحه یک فریم رسم شد
+        Clock.schedule_once(lambda dt: self._save_done(activity_id, new_state), 0)
+
+    def _save_done(self, activity_id, is_done):
         self.db.set_completion(activity_id, self.today, is_done)
-        self.refresh()
+        self.update_status_card()
 
     def set_emergency(self, *args):
         self.db.set_emergency(self.today)
