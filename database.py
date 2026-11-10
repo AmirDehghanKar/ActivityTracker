@@ -103,6 +103,7 @@ class Database:
             days = [int(d) for d in r["recurrence"].split(",") if d.strip().isdigit()]
             if weekday in days:
                 result.append(r)
+        result.sort(key=lambda a: (a["time"], a["id"]))
         return result
 
     def purge_status_before_first_activity(self):
