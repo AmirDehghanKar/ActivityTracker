@@ -53,7 +53,19 @@ jobs:
         run: |
           set -o pipefail
           buildozer android debug 2>&1 | tee build.log
-      
+
+      - name: Re-sign APK with fixed key
+        run: |
+          BT=$(ls -d ~/.buildozer/android/platform/android-sdk/build-tools/* | sort -V | tail -n 1)
+          APK=$(ls bin/*.apk | head -n 1)
+          "$BT/zipalign" -f -p 4 "$APK" /tmp/aligned.apk
+          "$BT/apksigner" sign \
+            --ks ~/.android/debug.keystore \
+            --ks-pass pass:android --key-pass pass:android \
+            --ks-key-alias androiddebugkey \
+            --out "$APK" /tmp/aligned.apk
+          "$BT/apksigner" verify --print-certs "$APK" | grep "SHA-256"
+          
       - name: Compare signing key
         if: always()
         continue-on-error: true
