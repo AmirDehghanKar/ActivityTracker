@@ -8,7 +8,7 @@
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
 ![Kivy](https://img.shields.io/badge/Kivy-2.3.1-00A98F)
 ![KivyMD](https://img.shields.io/badge/KivyMD-1.2.0-003566)
-![Version](https://img.shields.io/badge/version-1.0.4-ffc300)
+![Version](https://img.shields.io/badge/version-1.0.6-ffc300)
 
 [🇮🇷 فارسی](#-فارسی) · [🇬🇧 English](#-english) · [⬇️ Download / دانلود](https://github.com/AmirDehghanKar/ActivityTracker/releases/latest)
 
