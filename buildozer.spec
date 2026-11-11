@@ -14,7 +14,7 @@ source.dir = .
 source.include_exts = py,png,jpg,jpeg,gif,ttf,kv,atlas,json,txt
 
 # نسخه اپ
-version = 1.0.5
+version = 1.0.6
 
 # نیازمندی‌ها
 requirements = hostpython3==3.11.6,python3==3.11.6,kivy==2.3.1,kivymd==1.2.0,pillow,sqlite3,arabic-reshaper,python-bidi==0.4.2,jdatetime,six
