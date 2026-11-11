@@ -8,6 +8,10 @@ from kivy.metrics import dp
 import jdatetime
 from persian import fa
 from datetime import date
+from datetime import timedelta
+from kivy.uix.widget import Widget
+from kivy.uix.label import Label
+from kivy.graphics import Color, RoundedRectangle
 
 PRIMARY = (0.0, 0.208, 0.400, 1)      # #003566
 SECONDARY = (1.0, 0.765, 0.0, 1)      # #ffc300
@@ -16,8 +20,23 @@ DARK_TEXT = (0.12, 0.12, 0.12, 1)
 LIGHT_BG = (0.96, 0.97, 0.98, 1)
 CARD_BG = (1, 1, 1, 1)
 GRAY_BTN = (0.85, 0.87, 0.90, 1)
+GREEN = (0.15, 0.65, 0.35, 1)
+RED = (0.85, 0.25, 0.25, 1)
+BAR_GRAY = (0.82, 0.84, 0.88, 1)
 
+class Bar(Widget):
+    """یک میله رنگی با گوشه‌های گرد"""
+    def __init__(self, color, **kwargs):
+        super().__init__(**kwargs)
+        with self.canvas:
+            Color(*color)
+            self._rect = RoundedRectangle(pos=self.pos, size=self.size, radius=[dp(3)])
+        self.bind(pos=self._update, size=self._update)
 
+    def _update(self, *args):
+        self._rect.pos = self.pos
+        self._rect.size = self.size
+        
 class ReportsScreen(MDScreen):
     def __init__(self, db, **kwargs):
         super().__init__(**kwargs)
@@ -199,7 +218,10 @@ class ReportsScreen(MDScreen):
             spacing=dp(8)
         )
         list_box.bind(minimum_height=list_box.setter("height"))
-
+        
+        if report:
+            list_box.add_widget(self.build_days_chart(report, self.current_days))
+            
         status_map = {
             "green": (("انجام شده ✓"), (0.15, 0.65, 0.35, 1)),
             "yellow": (("اضطراری"), SECONDARY),
@@ -349,6 +371,18 @@ class ReportsScreen(MDScreen):
         )
         list_box.bind(minimum_height=list_box.setter("height"))
 
+        chart_items = []
+        for m in range(12, 0, -1):        # اسفند سمت چپ، فروردین سمت راست
+            s = stats[m]
+            cnt = s["green"] + s["yellow"] + s["red"]
+            if cnt == 0:
+                chart_items.append((str(m), 0.0, BAR_GRAY))
+                continue
+            m_days = 31 if m <= 6 else (30 if m <= 11 else last_day)
+            chart_items.append((str(m), s["score"] / (m_days * 10), PRIMARY))
+        if rows:
+            list_box.add_widget(self._make_chart(fa("نمودار موفقیت ماه‌های سال"), chart_items, 1))
+            
         has_data = False
         for m in range(1, 13):
             s = stats[m]
@@ -512,6 +546,80 @@ class ReportsScreen(MDScreen):
 
         scroll.add_widget(list_box)
         self.content.add_widget(scroll)
+
+        def _make_chart(self, title, items, label_every=1):
+        """items: لیست (برچسب، نسبت ۰ تا ۱، رنگ) از چپ به راست"""
+        spacing = dp(6) if len(items) <= 12 else dp(2)
+
+        card = MDCard(
+            orientation="vertical",
+            padding=dp(12),
+            spacing=dp(6),
+            size_hint_y=None,
+            height=dp(196),
+            radius=[16],
+            elevation=1,
+            md_bg_color=CARD_BG
+        )
+        card.add_widget(MDLabel(
+            text=title,
+            font_name="Vazir",
+            theme_text_color="Custom",
+            text_color=PRIMARY,
+            bold=True,
+            halign="right",
+            size_hint_y=None,
+            height=dp(22)
+        ))
+
+        plot = MDBoxLayout(size_hint_y=None, height=dp(110), spacing=spacing)
+        labels = MDBoxLayout(size_hint_y=None, height=dp(18), spacing=spacing)
+
+        for i, (label, ratio, color) in enumerate(items):
+            r = min(max(ratio, 0.03), 1.0)
+            col = MDBoxLayout(orientation="vertical")
+            col.add_widget(Widget(size_hint_y=1 - r))
+            col.add_widget(Bar(color, size_hint_y=r))
+            plot.add_widget(col)
+
+            labels.add_widget(Label(
+                text=label if i % label_every == 0 else "",
+                font_name="Vazir",
+                font_size="9sp",
+                color=(0.45, 0.48, 0.52, 1)
+            ))
+
+        card.add_widget(plot)
+        card.add_widget(labels)
+        return card
+
+    def _status_bar(self, row):
+        s = row["status"] if row else None
+        if s == "green":
+            return 1.0, GREEN
+        if s == "yellow":
+            return 0.5, SECONDARY
+        if s == "red":
+            return 0.12, RED
+        if s == "pending":
+            return 0.08, BAR_GRAY
+        return 0.04, BAR_GRAY           # روز بدون برنامه
+
+    def build_days_chart(self, report, days):
+        by_date = {r["date"]: r for r in report}
+        today = date.today()
+        letters = ["ش", "ی", "د", "س", "چ", "پ", "ج"]   # شنبه = ۰
+
+        items = []
+        for i in range(days):        # جدیدترین سمت چپ، قدیمی‌ترین سمت راست
+            d = today - timedelta(days=i)
+            j = jdatetime.date.fromgregorian(year=d.year, month=d.month, day=d.day)
+            ratio, color = self._status_bar(by_date.get(d.isoformat()))
+            label = fa(letters[j.weekday()]) if days == 7 else str(j.day)
+            items.append((label, ratio, color))
+
+        title = fa("نمودار وضعیت ۷ روز اخیر") if days == 7 else fa("نمودار وضعیت ۳۰ روز اخیر")
+        return self._make_chart(title, items, 1 if days == 7 else 5)
         
     def go_back(self, *args):
         self.manager.current = "today"
