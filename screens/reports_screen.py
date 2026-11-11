@@ -547,8 +547,7 @@ class ReportsScreen(MDScreen):
         scroll.add_widget(list_box)
         self.content.add_widget(scroll)
 
-        def _make_chart(self, title, items, label_every=1):
-        """items: لیست (برچسب، نسبت ۰ تا ۱، رنگ) از چپ به راست"""
+    def _make_chart(self, title, items, label_every=1):
         spacing = dp(6) if len(items) <= 12 else dp(2)
 
         card = MDCard(
