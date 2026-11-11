@@ -53,20 +53,23 @@ jobs:
         run: |
           set -o pipefail
           buildozer android debug 2>&1 | tee build.log
-          
-      - name: Show signing fingerprint
-        run: |
-          keytool -printcert -jarfile bin/*.apk | grep -E "Owner|SHA256"
-          
+             
       - name: Find the real error
         if: failure()
         run: grep -n -E "ImportError|ModuleNotFoundError|sh.ErrorReturnCode|# Command failed|What went wrong|FAILURE:|BUILD FAILED" build.log | cut -c1-300 | tail -n 15
-
+       
       - uses: actions/upload-artifact@v4
         with:
           name: package
           path: bin/*.apk
-
+     
+      - name: Show signing fingerprint
+        if: always()
+        continue-on-error: true
+        run: |
+          AS=$(find ~/.buildozer/android/platform/android-sdk/build-tools -name apksigner | sort | tail -n 1)
+          "$AS" verify --print-certs bin/*.apk | grep -E "DN|SHA-256"
+   
       - name: Diagnose manifest
         if: always()
         continue-on-error: true
