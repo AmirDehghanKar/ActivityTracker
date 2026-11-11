@@ -56,8 +56,11 @@ jobs:
              
       - name: Find the real error
         if: failure()
-        run: grep -n -E "ImportError|ModuleNotFoundError|sh.ErrorReturnCode|# Command failed|What went wrong|FAILURE:|BUILD FAILED" build.log | cut -c1-300 | tail -n 15
-       
+        run: |
+          grep -n -E "What went wrong|FAILURE:|Execution failed|Keystore|tampered|Failed to read key|error:|Exception" build.log | cut -c1-300 | tail -n 25
+          echo "=== last 60 lines ==="
+          tail -n 60 build.log | cut -c1-300
+          
       - uses: actions/upload-artifact@v4
         with:
           name: package
