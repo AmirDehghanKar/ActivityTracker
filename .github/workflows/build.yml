@@ -53,7 +53,19 @@ jobs:
         run: |
           set -o pipefail
           buildozer android debug 2>&1 | tee build.log
-             
+      
+      - name: Compare signing key
+        if: always()
+        continue-on-error: true
+        run: |
+          norm() { tr -d ':' | tr 'A-Z' 'a-z'; }
+          KS=$(keytool -list -v -keystore ~/.android/debug.keystore -storepass android 2>/dev/null | grep "SHA256:" | head -n 1 | awk '{print $NF}' | norm)
+          AS=$(find ~/.buildozer/android/platform/android-sdk/build-tools -name apksigner | sort | tail -n 1)
+          APK=$("$AS" verify --print-certs bin/*.apk 2>/dev/null | grep "SHA-256 digest" | head -n 1 | awk '{print $NF}' | norm)
+          echo "keystore sha256: $KS"
+          echo "apk      sha256: $APK"
+          [ "$KS" = "$APK" ] && echo "MATCH: apk is signed with the restored key" || echo "MISMATCH"
+          
       - name: Find the real error
         if: failure()
         run: |
